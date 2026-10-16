@@ -18,6 +18,18 @@ export class ProductsService {
   async create(createProductDto: CreateProductDto) {
 
     try {
+
+      if( !createProductDto.slug) {
+        createProductDto.slug = createProductDto.title.
+        toLocaleLowerCase().
+        replaceAll(' ','_')
+        .replace("'",'')
+      }else{
+          createProductDto.slug = createProductDto.slug.
+        toLocaleLowerCase().
+        replaceAll(' ','_')
+        .replace("'",'')
+      }
       
       const product = this.productRepository.create(createProductDto);
       await this.productRepository.save ( product ) ; 
