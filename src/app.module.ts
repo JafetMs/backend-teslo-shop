@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductsModule } from './products/products.module.js';
+import { CommonModule } from './common/common.module.js';
 
 @Module({
   imports: [ConfigModule.forRoot(),
@@ -19,7 +20,9 @@ import { ProductsModule } from './products/products.module.js';
       // logging: ['query', 'error', 'schema'],
     }),
 
-    ProductsModule
+    ProductsModule,
+
+    CommonModule
 
   ],
   controllers: [],
