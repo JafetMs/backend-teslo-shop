@@ -24,70 +24,78 @@ export class ProductsService {
 
   async create(createProductDto: CreateProductDto) {
     try {
-  
       const product = this.productRepository.create(createProductDto);
-  
+
       await this.productRepository.save(product);
-  
+
       return product;
     } catch (error: any) {
-  
       this.handleExceptions(error);
     }
   }
 
-  async findAll({ limit = 10, offset = 0} : PaginationDto) {
+  async findAll({ limit = 10, offset = 0 }: PaginationDto) {
     return await this.productRepository.find({
-      take:limit,
-      skip: offset
+      take: limit,
+      skip: offset,
 
       // Todo: relations
     });
   }
 
   async findOne(term: string) {
+    let product: Product | null = null;
 
-    let product : Product | null = null;
-
-    if( isUUID(term)) {
-      product = await this.productRepository.findOneBy({id: term});
-
-    }else{
+    if (isUUID(term)) {
+      product = await this.productRepository.findOneBy({ id: term });
+    } else {
       const queryBuilder = this.productRepository.createQueryBuilder();
-      console.log(term)
+      console.log(term);
       product = await queryBuilder
-      .where(`LOWER(title) = :title or slug =:slug`,{
-        title: term.toLowerCase(),
-        slug: term,
-
-      }).getOne();
-
+        .where(`LOWER(title) = :title or slug =:slug`, {
+          title: term.toLowerCase(),
+          slug: term,
+        })
+        .getOne();
     }
 
-    if(!product) {
-       throw new NotFoundException(`Product with term: ${term} not found`)
-    };
+    if (!product) {
+      throw new NotFoundException(`Product with term: ${term} not found`);
+    }
 
     return product;
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: string, updateProductDto: UpdateProductDto) {
+    const product = await this.productRepository.preload({
+      id: id,
+      ...updateProductDto,
+    });
+
+    console.log(updateProductDto)
+
+    if (!product) throw new NotFoundException(`Product with ${id} not found`);
+
+    try {
+      await this.productRepository.save(product);
+
+      return product;
+    } catch (error) {
+      this.handleExceptions(error);
+    }
   }
 
   async remove(id: string) {
-
     const { affected } = await this.productRepository.delete(id);
 
-    if ( affected === 0) {
-      throw new BadRequestException(`Product with id: ${id } not found`)
+    if (affected === 0) {
+      throw new BadRequestException(`Product with id: ${id} not found`);
     }
 
-    return  {
+    return {
       ok: true,
-      message: 'Product deleted succesfully'
-    }
-
+      message: 'Product deleted succesfully',
+    };
   }
 
   private handleExceptions(error: any) {
