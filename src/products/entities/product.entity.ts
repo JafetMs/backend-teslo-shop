@@ -3,8 +3,11 @@ import {
   BeforeUpdate,
   Column,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
+  type Relation
 } from 'typeorm';
+import { ProductImage } from './product.image.entity.js';
 
 @Entity()
 export class Product {
@@ -45,11 +48,16 @@ export class Product {
   @Column('text')
   gender: string;
 
-  @Column('text',{
+  @Column('text', {
     array: true,
-    default: []
+    default: [],
   })
-  tags:string[];
+  tags: string[];
+
+  @OneToMany(() => ProductImage, 
+  (productImage) => productImage.product,
+  {  cascade: true, eager:true})
+  images?: Relation<ProductImage[]>;
 
   @BeforeInsert()
   checkSlugInsert() {
@@ -63,12 +71,12 @@ export class Product {
       .replaceAll("'", '');
   }
 
- @BeforeUpdate()
-checkSlugUpdate() {
-  this.slug = this.slug
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replaceAll("'", '');
-}
+  @BeforeUpdate()
+  checkSlugUpdate() {
+    this.slug = this.slug
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replaceAll("'", '');
+  }
 }

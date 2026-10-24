@@ -44,5 +44,10 @@ export class CreateProductDto {
     tags: string[];
 
 
+    @IsString({each:true})
+    @IsArray()
+    @ArrayUnique()
+    @IsOptional()
+    images : string[]
 
 }
