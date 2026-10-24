@@ -8,11 +8,10 @@ import {
 import { CreateProductDto } from './dto/create-product.dto.js';
 import { UpdateProductDto } from './dto/update-product.dto.js';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { PaginationDto } from '../common/dtos/pagination.dto.js';
 import { isUUID } from 'class-validator';
 import { Product, ProductImage } from './entities/index.js';
-import { DataSource } from 'typeorm';
 
 @Injectable()
 export class ProductsService {
@@ -67,6 +66,7 @@ export class ProductsService {
     let product: Product | null = null;
 
     if (isUUID(term)) {
+      console.log('uiid')
       product = await this.productRepository.findOneBy({ id: term });
     } else {
       // Here I use Query Builder
@@ -83,6 +83,9 @@ export class ProductsService {
     if (!product) {
       throw new NotFoundException(`Product with term: ${term} not found`);
     }
+
+
+    console.log('Ola')
     return {
       ...product,
       images: product.images?.map(img => img.url)
@@ -106,18 +109,17 @@ export class ProductsService {
 
 
     if (images) {
+      console.log('images')
         await queryRunner.manager.delete(
           ProductImage,
           { product :  id}
-        )
 
+        )
         product.images = images.map( 
           img => this.productImageRepository.create({url: img} )
         )
-    } else {
 
-
-    }
+    } 
 
       await queryRunner.manager.save( product );
       // await this.productRepository.save(product);
@@ -125,7 +127,7 @@ export class ProductsService {
       await queryRunner.commitTransaction();
       await queryRunner.release();
 
-      return product;
+      return await this.findOne( id ); 
     } catch (error) {
 
       await queryRunner.rollbackTransaction();
@@ -157,4 +159,16 @@ export class ProductsService {
 
     throw new InternalServerErrorException('Unexpected error, check the logs');
   }
+
+  async deleeteAllProducts() {
+    const query = this.productRepository.createQueryBuilder('product');
+ 
+    try {
+      return await query.delete()
+      .where({})
+      .execute();
+    } catch (error) {
+        this.handleExceptions(error)
+    }
+  } 
 }
