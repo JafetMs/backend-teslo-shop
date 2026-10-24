@@ -165,7 +165,6 @@ export class ProductsService {
  
     try {
       return await query.delete()
-      .where({})
       .execute();
     } catch (error) {
         this.handleExceptions(error)

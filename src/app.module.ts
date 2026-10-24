@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductsModule } from './products/products.module.js';
 import { CommonModule } from './common/common.module.js';
+import { SeedModule } from './seed/seed.module.js';
 
 @Module({
   imports: [ConfigModule.forRoot(),
@@ -22,7 +23,9 @@ import { CommonModule } from './common/common.module.js';
 
     ProductsModule,
 
-    CommonModule
+    CommonModule,
+
+    SeedModule
 
   ],
   controllers: [],
