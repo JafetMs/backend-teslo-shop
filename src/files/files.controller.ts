@@ -1,11 +1,6 @@
 import {
   Controller,
-  Get,
   Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
   UploadedFile,
   UseInterceptors,
   BadRequestException,
@@ -14,13 +9,18 @@ import { FilesService } from './files.service.js';
 import type { Express} from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { fileFilter } from './helpers/fileFilter.helper.js';
+import { diskStorage } from 'multer';
 @Controller('files')
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
   @Post('product')
   @UseInterceptors(FileInterceptor('file',{
-    fileFilter: fileFilter
+    fileFilter: fileFilter,
+    // limits: { fieldSize: 500}
+    storage: diskStorage({
+      destination: './static/uploads'
+    })
   }))
   uploadFile( @UploadedFile() file: Express.Multer.File) {
 
@@ -30,3 +30,5 @@ export class FilesController {
     return  file.originalname;
   }
 }
+
+
