@@ -84,8 +84,6 @@ export class ProductsService {
       throw new NotFoundException(`Product with term: ${term} not found`);
     }
 
-
-    console.log('Ola')
     return {
       ...product,
       images: product.images?.map(img => img.url)
@@ -155,7 +153,6 @@ export class ProductsService {
       throw new BadRequestException(error.detail);
     }
     this.logger.error(error);
-    // console.log(error);
 
     throw new InternalServerErrorException('Unexpected error, check the logs');
   }

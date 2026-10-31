@@ -9,6 +9,7 @@ import { CommonModule } from './common/common.module.js';
 import { SeedModule } from './seed/seed.module.js';
 import { FilesModule } from './files/files.module.js';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { AuthModule } from './auth/auth.module.js';
 
 
 const __dirname = dirname(fileURLToPath(import.meta.url)); // New Version
@@ -42,6 +43,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url)); // New Version
     SeedModule,
 
     FilesModule,
+
+    AuthModule,
   ],
   controllers: [],
   providers: [],
