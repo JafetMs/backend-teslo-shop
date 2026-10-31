@@ -1,9 +1,10 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto.js';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity.js';
 import { Repository } from 'typeorm';
-import { error } from 'console';
+import { InjectRepository } from '@nestjs/typeorm';
+
+import * as bcrypt from 'bcrypt'
+import { CreateUserDto } from './dto/create-user.dto.js';
+import { User } from './entities/user.entity.js';
 
 @Injectable()
 export class AuthService {
@@ -16,8 +17,15 @@ export class AuthService {
 
   async create(createUserDto: CreateUserDto) {
     try {
+
+      const { password, ...userData } = createUserDto;
         
-      const user = this.userRepository.create( createUserDto );
+      const user = this.userRepository.create( {
+          ...userData,
+          password : bcrypt.hashSync( password, 10)
+
+      });
+      
       await this.userRepository.save( user )
 
       return user;
