@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('users')
 export class User{
@@ -29,5 +29,17 @@ export class User{
         default:['user']
     })
     roles: string[];
+
+
+    @BeforeInsert()
+    checkFiledBeforeInsert() {
+        this.email = this.email.toLocaleLowerCase().trim();
+    }
+
+    @BeforeUpdate()
+    checkFileBeforeUpdate() {
+        this.checkFileBeforeUpdate();
+    }
+
 
 }

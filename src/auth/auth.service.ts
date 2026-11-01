@@ -1,75 +1,82 @@
-import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { JwtService } from '@nestjs/jwt';
 
-import * as bcrypt from 'bcrypt'
 import { User } from './entities/user.entity.js';
 import { CreateUserDto, LoginUserDto } from './dto/index.js';
-
+import { JwtPayload } from './interfaces/jwt-payload.js';
 
 @Injectable()
 export class AuthService {
-
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) { }
-
+    private readonly jwtService: JwtService
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
     try {
-
       const { password, ...userData } = createUserDto;
-        
-      const user = this.userRepository.create( {
-          ...userData,
-          password : bcrypt.hashSync( password, 10)
 
+      const user = this.userRepository.create({
+        ...userData,
+        password: bcrypt.hashSync(password, 10),
       });
 
-      await this.userRepository.save( user )
+      await this.userRepository.save(user);
 
-      return user;
+      return {
+        ...user,
+        token: this.getJwtToken( { email : user.email})
+      }
 
       // TODO: Return access JWT
-
-    } catch (error) { 
-
+    } catch (error) {
       this.handleDBErrors(error);
-
     }
-    
   }
 
-  async login( loginUserDto: LoginUserDto ) {
-    
-      const { email, password} = loginUserDto;
+  async login(loginUserDto: LoginUserDto) {
+    const { email, password } = loginUserDto;
 
-      const user = await this.userRepository.findOne({ where: {email},
-        select : { email : true, password: true}
-        
-      })
+    const user = await this.userRepository.findOne({
+      where: { email },
+      select: { email: true, password: true },
+    });
 
-      if ( !user ) {
-        throw new UnauthorizedException('Credentials are not valid (email)')
-      }
-      if (!bcrypt.compareSync(password,user.password))
-        throw new UnauthorizedException('Credentials are not valid (password)')
+    if (!user) {
+      throw new UnauthorizedException('Credentials are not valid (email)');
+    }
+    if (!bcrypt.compareSync(password, user.password))
+      throw new UnauthorizedException('Credentials are not valid (password)');
 
-
-      return user;
-     
+    return {
+      ...user,
+      token: this.getJwtToken( { email: user.email} )
+    }
   }
 
-    private handleDBErrors ( error: any ) : never {
+  private getJwtToken(payload: JwtPayload) {
 
-      if ( error.code == '23505')
-          throw new BadRequestException( error.detail );
+    const token = this.jwtService.sign( payload );
 
-      console.log(error);
+    return token;
 
+  }
 
-      throw new InternalServerErrorException('Please check server logs')
-    }
-  
+  private handleDBErrors(error: any): never {
+    if (error.code == '23505') throw new BadRequestException(error.detail);
+
+    console.log(error);
+
+    throw new InternalServerErrorException('Please check server logs');
+  }
 }
