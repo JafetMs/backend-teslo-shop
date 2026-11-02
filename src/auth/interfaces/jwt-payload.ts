@@ -1,5 +1,5 @@
 export interface JwtPayload {
-    email:string;
+    id:string;
 
 
     // Todo: Lo q ueira save
