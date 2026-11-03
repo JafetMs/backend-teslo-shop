@@ -1,7 +1,8 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { SeedService } from './seed.service.js';
-import { CreateSeedDto } from './dto/create-seed.dto.js';
-import { UpdateSeedDto } from './dto/update-seed.dto.js';
+
+import { Auth } from '../auth/decorators/auth.decorator.js';
+import { ValidRoles } from '../auth/interfaces/valid-roles.js';
 
 @Controller('seed')
 export class SeedController {
@@ -9,6 +10,7 @@ export class SeedController {
 
   
   @Get()
+  // @Auth( ValidRoles.admin)
   executeSeed() {
     return this.seedService.runSeed()
   }

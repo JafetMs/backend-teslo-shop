@@ -9,6 +9,7 @@ import { getRawHeaders } from './decorators/raw-headers.decorators.js';
 import { UserRoleGuard } from './guards/user-role.guard.js';
 import { RoleProtected } from './decorators/role-protected.decorator.js';
 import { ValidRoles } from './interfaces/valid-roles.js';
+import { Auth } from './decorators/auth.decorator.js';
 
 
 
@@ -60,7 +61,15 @@ export class AuthController {
     };
   }
 
-
-
+  @Get('priv3')
+  @Auth(ValidRoles.superUser, ValidRoles.admin)
+  privateteRoute3(
+    @GetUser() user: User
+  ){
+    return {
+      oki: true,
+      user
+    };
+  }
  
 }

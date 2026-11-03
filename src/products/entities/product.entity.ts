@@ -3,11 +3,13 @@ import {
   BeforeUpdate,
   Column,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   type Relation
 } from 'typeorm';
 import { ProductImage } from './product.image.entity.js';
+import { User } from '../../auth/entities/user.entity.js';
 
 @Entity({ name: 'products'})
 export class Product {
@@ -58,6 +60,16 @@ export class Product {
   (productImage) => productImage.product,
   {  cascade: true, eager:true})
   images?: Relation<ProductImage[]>;
+
+
+  @ManyToOne(
+    () => User,
+    ( user) => user.product,
+    {
+      eager:true
+    }
+  )
+  user: Relation<User>;
 
   @BeforeInsert()
   checkSlugInsert() {

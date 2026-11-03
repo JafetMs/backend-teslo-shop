@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PassportModule } from '@nestjs/passport';
+import { AuthGuard, PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service.js';
 import { AuthController } from './auth.controller.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -49,7 +49,8 @@ import { JwtStrategy } from './strategies/jwt.strategy.js';
     TypeOrmModule,
     JwtStrategy,
     PassportModule,
-    JwtModule
+    JwtModule,
+  
   ]
 })
 export class AuthModule {}
