@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, SetMetadata } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 import { AuthService } from './auth.service.js';
@@ -6,6 +6,7 @@ import { CreateUserDto, LoginUserDto } from './dto/index.js';
 import { GetUser } from './decorators/get-user.decorator.js';
 import { User } from './entities/user.entity.js';
 import { getRawHeaders } from './decorators/raw-headers.decorators.js';
+import { UserRoleGuard } from './guards/user-role.guard.js';
 
 
 
@@ -43,6 +44,20 @@ export class AuthController {
          
     }
   }
+
+  @Get('priv2')
+  @SetMetadata('roles',['admin','super-user'])
+  @UseGuards( AuthGuard(), UserRoleGuard)
+  privateteRoute2(
+    @GetUser() user: User
+  ){
+    return {
+      oki: true,
+      user
+    };
+  }
+
+
 
  
 }
