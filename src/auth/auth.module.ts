@@ -50,7 +50,7 @@ import { JwtStrategy } from './strategies/jwt.strategy.js';
     JwtStrategy,
     PassportModule,
     JwtModule,
-  
+    AuthService
   ]
 })
 export class AuthModule {}
